@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1045227405419",
+    "project_id": "offline-first-28569",
+    "storage_bucket": "offline-first-28569.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1045227405419:android:90fa1696636441e3e2b12e",
+        "android_client_info": {
+          "package_name": "app.b4a.mangatrix.teste_offline_first"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMR8bkrxTv0UQQ3yZWg5xhf0cIilZlsjE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
