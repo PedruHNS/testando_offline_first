@@ -36,17 +36,26 @@ class ShoppingListController {
       isDone: false,
       isSynced: false,
     );
-
-    await LocalStorageSQFLITE.create(item: item);
     items.add(item);
+    await LocalStorageSQFLITE.create(item: item);
     clearEC();
   }
 
   Future<void> checkItem(String id) async {
-    LocalStorageSQFLITE.toggleIsDone(id);
+    final index = items.value.indexWhere((item) => item.id == id);
+    if (index == -1) return;
+    items.value[index] = items.value[index].copyWith(
+      isDone: !items.value[index].isDone,
+    );
+    items.value = <Item>[...items.value];
+    await LocalStorageSQFLITE.toggleIsDone(id);
   }
 
   Future<void> deleteItem(String id) async {
-    LocalStorageSQFLITE.deleteBuy(id);
+    final index = items.value.indexWhere((item) => item.id == id);
+    if (index == -1) return;
+    items.value.removeAt(index);
+
+    await LocalStorageSQFLITE.deleteBuy(id);
   }
 }

@@ -4,7 +4,4 @@ class LocalStorageRepository {
   final LocalStorageSQFLITE database;
 
   LocalStorageRepository({required this.database});
-
-
-
 }
