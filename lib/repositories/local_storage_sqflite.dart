@@ -2,10 +2,10 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:teste_offline_first/model/item_model.dart';
 
-class LocalStorageSQFLITE {
+class LocalStorageRepository {
   static Database? _db;
 
-  static Future<void> init() async {
+  Future<void> init() async {
     final path = join(await getDatabasesPath(), 'buy_list.db');
 
     _db = await openDatabase(
@@ -27,7 +27,7 @@ class LocalStorageSQFLITE {
     );
   }
 
-  static Future<void> create({required Item item}) async {
+  Future<void> create({required Item item}) async {
     await _db?.insert(
       'buy',
       item.toMap(),
@@ -35,12 +35,12 @@ class LocalStorageSQFLITE {
     );
   }
 
-  static Future<List<Item>> getBuy() async {
+  Future<List<Item>> getBuy() async {
     final list = await _db?.query('buy') ?? [];
     return list.map((e) => Item.fromMap(e)).toList();
   }
 
-  static Future<void> toggleIsDone(String id) async {
+  Future<void> toggleIsDone(String id) async {
     final result = await _db?.query(
       'buy',
       columns: ['isDone'],
@@ -63,15 +63,17 @@ class LocalStorageSQFLITE {
     }
   }
 
-  static Future<void> markIsSynced(String id) async {
+  Future<void> markIsSynced(String id) async {
     await _db?.update('buy', {'isSynced': 1}, where: 'id = ?', whereArgs: [id]);
   }
 
-  static Future<void> deleteBuy(String id) async{
-    await _db?.delete(
-      'buy',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  Future<List<Item>> getUnsynced() async {
+    final list =
+        await _db?.query('buy', where: 'isSynced = ?', whereArgs: [0]) ?? [];
+    return list.map((e) => Item.fromMap(e)).toList();
+  }
+
+  Future<void> deleteBuy(String id) async {
+    await _db?.delete('buy', where: 'id = ?', whereArgs: [id]);
   }
 }

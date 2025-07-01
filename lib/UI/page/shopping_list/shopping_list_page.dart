@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:teste_offline_first/UI/page/shopping_list/shopping_list_controller.dart';
 import 'package:teste_offline_first/UI/widget/adicionar_item_modal.dart';
 import 'package:teste_offline_first/UI/widget/card_item.dart';
+import 'package:teste_offline_first/repositories/local_storage_sqflite.dart';
+import 'package:teste_offline_first/services/firebase_firestore_service.dart';
 
 class ShoppingListPage extends StatefulWidget {
   const ShoppingListPage({super.key});
@@ -12,7 +15,8 @@ class ShoppingListPage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<ShoppingListPage> {
-  final controller = ShoppingListController();
+  final controller = GetIt.I<ShoppingListController>();
+
   void _showBottomSheet() {
     showModalBottomSheet(
       isScrollControlled: true,
@@ -21,12 +25,6 @@ class _MyHomePageState extends State<ShoppingListPage> {
         return AdicionarItemModal(controller: controller);
       },
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    controller.onInit();
   }
 
   @override

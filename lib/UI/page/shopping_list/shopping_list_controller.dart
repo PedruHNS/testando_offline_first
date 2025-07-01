@@ -1,13 +1,24 @@
+import 'dart:developer';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals.dart';
-import 'package:teste_offline_first/core/local_storage_sqflite.dart';
+import 'package:teste_offline_first/repositories/local_storage_sqflite.dart';
 import 'package:teste_offline_first/model/item_model.dart';
+
+import 'package:teste_offline_first/services/firebase_firestore_service.dart';
+import 'package:teste_offline_first/utils/base_controller.dart';
 import 'package:uuid/uuid.dart';
 
-class ShoppingListController {
+class ShoppingListController extends BaseController {
+  final LocalStorageRepository local;
+  final FirebaseFirestoreService firestore;
+
+  ShoppingListController({required this.local, required this.firestore});
   final nameEC = TextEditingController();
   final valueEC = TextEditingController();
   final qtdEC = TextEditingController();
+  final connectivity = Connectivity();
 
   void clearEC() {
     nameEC.clear();
@@ -17,13 +28,24 @@ class ShoppingListController {
 
   final items = ListSignal<Item>([]);
 
+  @override
   Future<void> onInit() async {
-    await LocalStorageSQFLITE.init();
+    await local.init();
     await _getListBuy();
+    // connectivityChange();
+    connectivity.onConnectivityChanged.listen((result) {
+      log(result.toString());
+      if (!result.contains(ConnectivityResult.none)) {
+        log(result.toString());
+        firestore.syncItem();
+      }
+    });
   }
 
+  void connectivityChange() {}
+
   Future<void> _getListBuy() async {
-    final result = await LocalStorageSQFLITE.getBuy();
+    final result = await local.getBuy();
     items.value = result;
   }
 
@@ -37,7 +59,7 @@ class ShoppingListController {
       isSynced: false,
     );
     items.add(item);
-    await LocalStorageSQFLITE.create(item: item);
+    await local.create(item: item);
     clearEC();
   }
 
@@ -48,7 +70,7 @@ class ShoppingListController {
       isDone: !items.value[index].isDone,
     );
     items.value = <Item>[...items.value];
-    await LocalStorageSQFLITE.toggleIsDone(id);
+    await local.toggleIsDone(id);
   }
 
   Future<void> deleteItem(String id) async {
@@ -56,6 +78,6 @@ class ShoppingListController {
     if (index == -1) return;
     items.value.removeAt(index);
 
-    await LocalStorageSQFLITE.deleteBuy(id);
+    await local.deleteBuy(id);
   }
 }
