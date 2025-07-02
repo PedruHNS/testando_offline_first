@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:teste_offline_first/model/item_model.dart';
@@ -37,6 +39,7 @@ class LocalStorageRepository {
 
   Future<List<Item>> getBuy() async {
     final list = await _db?.query('buy') ?? [];
+    log(list.toString());
     return list.map((e) => Item.fromMap(e)).toList();
   }
 

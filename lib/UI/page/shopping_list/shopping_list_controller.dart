@@ -32,9 +32,12 @@ class ShoppingListController extends BaseController {
   Future<void> onInit() async {
     await local.init();
     await _getListBuy();
-    // connectivityChange();
+    connectivityChange();
+    listenToFirestore();
+  }
+
+  void connectivityChange() {
     connectivity.onConnectivityChanged.listen((result) {
-      log(result.toString());
       if (!result.contains(ConnectivityResult.none)) {
         log(result.toString());
         firestore.syncItem();
@@ -42,7 +45,10 @@ class ShoppingListController extends BaseController {
     });
   }
 
-  void connectivityChange() {}
+  Future<void> listenToFirestore() async {
+    firestore.snapshotsListen();
+    await _getListBuy();
+  }
 
   Future<void> _getListBuy() async {
     final result = await local.getBuy();
@@ -50,6 +56,8 @@ class ShoppingListController extends BaseController {
   }
 
   Future<void> addItem() async {
+    final List<ConnectivityResult> connectivityResult =
+        await (Connectivity().checkConnectivity());
     final item = Item(
       id: Uuid().v4(),
       name: nameEC.text,
@@ -60,10 +68,18 @@ class ShoppingListController extends BaseController {
     );
     items.add(item);
     await local.create(item: item);
+
+    if (!connectivityResult.contains(ConnectivityResult.none)) {
+      log(connectivityResult.toString());
+      firestore.syncItem();
+    }
+
     clearEC();
   }
 
   Future<void> checkItem(String id) async {
+    final List<ConnectivityResult> connectivityResult =
+        await (Connectivity().checkConnectivity());
     final index = items.value.indexWhere((item) => item.id == id);
     if (index == -1) return;
     items.value[index] = items.value[index].copyWith(
@@ -71,13 +87,23 @@ class ShoppingListController extends BaseController {
     );
     items.value = <Item>[...items.value];
     await local.toggleIsDone(id);
+    if (!connectivityResult.contains(ConnectivityResult.none)) {
+      log(connectivityResult.toString());
+      firestore.syncItem();
+    }
   }
 
   Future<void> deleteItem(String id) async {
+    final List<ConnectivityResult> connectivityResult =
+        await (Connectivity().checkConnectivity());
     final index = items.value.indexWhere((item) => item.id == id);
     if (index == -1) return;
     items.value.removeAt(index);
 
     await local.deleteBuy(id);
+    if (!connectivityResult.contains(ConnectivityResult.none)) {
+      log(connectivityResult.toString());
+      firestore.removeItemSynced(id);
+    }
   }
 }
