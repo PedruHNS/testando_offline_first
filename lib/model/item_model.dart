@@ -59,4 +59,9 @@ class Item {
   String toJson() => json.encode(toMap());
 
   factory Item.fromJson(String source) => Item.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'Item(id: $id, name: $name, value: $value, qtd: $qtd, isDone: $isDone, isSynced: $isSynced)';
+  }
 }

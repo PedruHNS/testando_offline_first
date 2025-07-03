@@ -70,8 +70,8 @@ class ShoppingListController extends BaseController {
     await local.create(item: item);
 
     if (!connectivityResult.contains(ConnectivityResult.none)) {
-      log(connectivityResult.toString());
-      firestore.syncItem();
+      await firestore.syncItem();
+      await _getListBuy();
     }
 
     clearEC();
@@ -89,7 +89,7 @@ class ShoppingListController extends BaseController {
     await local.toggleIsDone(id);
     if (!connectivityResult.contains(ConnectivityResult.none)) {
       log(connectivityResult.toString());
-      firestore.syncItem();
+      await firestore.toggleItemFB();
     }
   }
 
@@ -103,7 +103,8 @@ class ShoppingListController extends BaseController {
     await local.deleteBuy(id);
     if (!connectivityResult.contains(ConnectivityResult.none)) {
       log(connectivityResult.toString());
-      firestore.removeItemSynced(id);
+      await firestore.removeItemSynced(id);
+      await _getListBuy(); 
     }
   }
 }

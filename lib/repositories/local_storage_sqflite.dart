@@ -59,7 +59,7 @@ class LocalStorageRepository {
       final newIsDone = currentIsDone == 1 ? 0 : 1;
       await _db?.update(
         'buy',
-        {'isDone': newIsDone, 'isSynced': 0},
+        {'isDone': newIsDone},
         where: 'id = ?',
         whereArgs: [id],
       );
